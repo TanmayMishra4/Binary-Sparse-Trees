@@ -7,7 +7,7 @@ int get_end_index(int row_number);
 int get_row_size(int row_number);
 void initialise_row(bsa* b, int row_number);
 void insert_in_row(bsa* b, int insertion_row, int indx, int d);
-bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr);
+bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr, int row);
 void insert_num_to_str(char* str, int* str_ind, int num);
 int reverse_number(int num);
 char int_to_char(int num);
@@ -92,11 +92,11 @@ bool bsa_tostring(bsa* b, char* str){
     for(int row=0;row<=last_row;row++){
         str[str_ind++] = '{';
 
-        bool did_insert = insert_to_string(str, &str_ind, &(b->row_array[row]));
+        bool did_insert = insert_to_string(str, &str_ind, &(b->row_array[row]), row);
 
-        if(did_insert ==true && row != last_row-1){
-            str[str_ind++] = ' ';
-        }
+        //if(did_insert == true){
+        //    str[str_ind++] = ' ';
+        //}
         str[str_ind++] = '}';
     }
     return true;
@@ -153,7 +153,7 @@ void insert_in_row(bsa* b, int insertion_row, int indx, int d){
     b->row_array[insertion_row].set_flag[indx] = true;
 }
 
-bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr){
+bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr, int row){
     bool flag = false;
     if(row_arr->size == 0){
         return flag;
@@ -161,10 +161,15 @@ bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr){
     for(int col=0;col<row_arr->size;col++){
         if(row_arr->set_flag[col] == true){
             flag = true;
+	    if(col != 0){
+                str[*str_ind] = ' ';
+                *str_ind = *str_ind + 1;
+            }
             str[*str_ind] = '[';
             *str_ind = *str_ind + 1;
 
-            insert_num_to_str(str, str_ind, col);
+            int actual_index = get_start_index(row) + col;
+	    insert_num_to_str(str, str_ind, actual_index);
 
             str[*str_ind] = ']';
             *str_ind = *str_ind + 1;
@@ -173,6 +178,11 @@ bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr){
             *str_ind = *str_ind + 1;
 
             insert_num_to_str(str, str_ind, row_arr->arr[col]);
+	    //if(col != row_arr->size-1){
+	        printf("col = %i and row size = %i, val = %i\n", col, row_arr->size, row_arr->arr[col]);
+	//	str[*str_ind] = ' ';
+	  //      *str_ind = *str_ind + 1;
+	    //}
         }
     }
     return flag;
@@ -187,10 +197,11 @@ void insert_num_to_str(char* str, int* str_ind, int num){
     //     str[*str_ind] = int_to_char(digit);
     //     *str_ind = *str_ind + 1;
     // }
-    char converted[CHAR_ARR_SIZE];
-    sprintf(converted, "%d", num);
-    printf("%i in string is\n", num);
-    puts(converted);
+    char converted[CHAR_ARR_SIZE] = {0};
+    sprintf(converted, "%i", num);
+    int num_chars = strlen(converted);
+    strcat(str, converted);
+    *str_ind = *str_ind + num_chars;
 }
 
 // int reverse_number(int num){
