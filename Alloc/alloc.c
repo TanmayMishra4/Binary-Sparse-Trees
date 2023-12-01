@@ -1,6 +1,5 @@
 #include "specific.h"
 
-
 int get_row_to_insert(int index);
 int get_start_index(int row_number);
 int get_end_index(int row_number);
@@ -9,13 +8,19 @@ void initialise_row(bsa* b, int row_number);
 void insert_in_row(bsa* b, int insertion_row, int indx, int d);
 bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr, int row);
 void insert_num_to_str(char* str, int* str_ind, int num);
-int reverse_number(int num);
-char int_to_char(int num);
 void clear_string(char* str);
 void free_row(bsa* b, int row);
 void update_last_index(bsa* b);
+// Testing Functions
+void test_get_row_to_insert(void);
+void test_get_row_capacity(void);
+void test_get_start_index(void);
+void test_get_end_index(void);
+void test_initialise_row(void);
+void test_free_row(void);
+void test_insert_num_to_str(void);
 
-// Create an empty BSA
+
 bsa* bsa_init(void){
     bsa* b = (bsa*)calloc(BSA_ROWS, sizeof(bsa));
     b->last_filled_index = -1;
@@ -24,8 +29,6 @@ bsa* bsa_init(void){
     return b;
 }
 
-// Set element at index indx with value d i.e. b[i] = d;
-// May require an allocation if it's the first element in that row
 bool bsa_set(bsa* b, int indx, int d){
     if(b == NULL || indx < 0){
         return false;
@@ -170,15 +173,22 @@ void initialise_row(bsa* b, int row_number){
 }
 
 int get_start_index(int row_number){
+    if(row_number < 0){
+        return -1;
+    }
     return ((1 << row_number)-1);
 }
 
 int get_end_index(int row_number){
+    if(row_number < 0){
+        return -1;
+    }
     int end = get_start_index(row_number)*2;
     return end;
 }
 
 int get_row_capacity(int row_number){
+    if(row_number < 0) return 0;
     int size = (1 << row_number);
     return size;
 }
@@ -240,10 +250,6 @@ void insert_num_to_str(char* str, int* str_ind, int num){
     // puts(str);
 }
 
-char int_to_char(int num){
-    return num + '0';
-}
-
 void clear_string(char* str){
     int i = 0;
     while(str[i] != '\0'){
@@ -262,6 +268,8 @@ void free_row(bsa* b, int row){
         free(b->row_array[row].set_flag);
         b->row_array[row].set_flag = NULL;
     }
+    b->row_array[row].size = 0;
+    b->row_array[row].capacity = 0;
 }
 
 void update_last_index(bsa* b){
@@ -278,7 +286,104 @@ void update_last_index(bsa* b){
 
 // You'll this to test the other functions you write
 void test(void){
-    return;
+    test_get_row_capacity();
+    test_get_end_index();
+    test_get_start_index();
+    test_get_row_to_insert();
+    test_initialise_row();
+    test_free_row();
+    test_insert_num_to_str();
 }
-                        
+                      
+void test_get_row_to_insert(void){
+    assert(get_row_to_insert(-70) == -1);
+    assert(get_row_to_insert(-1) == -1);
+    assert(get_row_to_insert(0) == 0);
+    assert(get_row_to_insert(1) == 1);
+    assert(get_row_to_insert(100) == 6);
+    assert(get_row_to_insert((1 << 29)-1) == 29);
+    assert(get_row_to_insert(15) == 4);
+}
+void test_get_row_capacity(void){
+    assert(get_row_capacity(-1) == 0);
+    assert(get_row_capacity(-599) == 0);
+    assert(get_row_capacity(0) == 1);
+    assert(get_row_capacity(1) == 2);
+    assert(get_row_capacity(12) == (1 << 12));
+    assert(get_row_capacity(29) == (1 << 29));
+}
+void test_get_start_index(void){
+    assert(get_start_index(0) == 0);
+    assert(get_start_index(1) == 1);
+    assert(get_start_index(29) == (1 << 29) -1);
+    assert(get_start_index(4) == 15);
+    assert(get_start_index(18) == (1 << 18)-1);
+    assert(get_start_index(-2) == -1);
+    assert(get_start_index(-70) == -1);
+}
+void test_get_end_index(void){
+    assert(get_end_index(0) == 0);
+    assert(get_end_index(1) == 2);
+    assert(get_end_index(29) == 2*((1 << 29) -1));
+    assert(get_end_index(4) == 30);
+    assert(get_end_index(18) == 2*((1 << 18)-1));
+    assert(get_end_index(-2) == -1);
+    assert(get_end_index(-70) == -1);
+}
+
+void test_initialise_row(void){
+    bsa* b = bsa_init();
+    initialise_row(b, 2);
+    assert(b->row_array[2].size == 0);
+    assert(b->row_array[2].capacity == 4);
+    assert(b->row_array[2].arr != NULL);
+    assert(b->row_array[2].set_flag != NULL);
+    assert(b->row_array[2].set_flag[0] == false);
+    assert(b->row_array[2].set_flag[1] == false);
+    assert(b->row_array[2].set_flag[3] == false);
+
+    initialise_row(b, 6);
+    assert(b->row_array[6].size == 0);
+    assert(b->row_array[6].capacity == 64);
+    assert(b->row_array[6].arr != NULL);
+    assert(b->row_array[6].set_flag != NULL);
+    assert(b->row_array[6].set_flag[0] == false);
+    assert(b->row_array[6].set_flag[5] == false);
+    assert(b->row_array[6].set_flag[63] == false);
+
+    bsa_free(b);
+}
+
+void test_free_row(void){
+    bsa* b = bsa_init();
+    initialise_row(b, 2);
+    initialise_row(b, 4);
+    free_row(b, 3);
+    free_row(b, 2);
+    assert(b->row_array[2].arr == NULL);
+    assert(b->row_array[2].set_flag == NULL);
+    assert(b->row_array[2].size == 0);
+    assert(b->row_array[2].capacity == 0);
+    free_row(b, 4);
+    assert(b->row_array[4].arr == NULL);
+    assert(b->row_array[4].set_flag == NULL);
+    assert(b->row_array[4].size == 0);
+    assert(b->row_array[4].capacity == 0);
+    bsa_free(b);
+}
+
+void test_insert_num_to_str(void){
+    char str[20];
+    insert_num_to_str(str, 0, 124);
+    assert(strcmp(str, "124") == 0);
+    clear_string(str);
+    insert_num_to_str(str, 0, 7456);
+    assert(strcmp(str, "7456") == 0);
+    clear_string(str);
+    insert_num_to_str(str, 0, 12837);
+    assert(strcmp(str, "12837") == 0);
+    clear_string(str);
+    insert_num_to_str(str, 0, -9459);
+    assert(strcmp(str, "-9459") == 0);
+}
 

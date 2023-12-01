@@ -99,6 +99,10 @@ int main(void)
    assert(strcmp(str, "{}{[1]=2 [2]=4}{[3]=6}")==0);
    bsa_free(b);
 
+   b = bsa_init();
+   assert(bsa_tostring(b, str));
+   assert(strlen(str) == 0);
+
    return 0;
 }
 
@@ -113,4 +117,6 @@ void twice(int* p, int* n)
    *n = 0;
    *p = *p * 2;
 }
+
+ 
    
