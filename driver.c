@@ -29,7 +29,6 @@ int main(void)
 
    // tostring
    assert(bsa_tostring(b, str));
-   puts(str);
    assert(strcmp(str, "{[0]=0}{}{}{}{[15]=15}")==0);
 
    // Get some values tbsa've already been set

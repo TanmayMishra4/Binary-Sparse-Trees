@@ -6,6 +6,7 @@
 typedef struct BSA_row{
     int* arr;
     int size;
+    int capacity;
     bool* set_flag;
 } BSA_row;
 
@@ -13,3 +14,5 @@ struct bsa{
     BSA_row* row_array;
     int last_filled_index;
 };
+
+

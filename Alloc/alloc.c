@@ -4,13 +4,16 @@
 int get_row_to_insert(int index);
 int get_start_index(int row_number);
 int get_end_index(int row_number);
-int get_row_size(int row_number);
+int get_row_capacity(int row_number);
 void initialise_row(bsa* b, int row_number);
 void insert_in_row(bsa* b, int insertion_row, int indx, int d);
 bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr, int row);
 void insert_num_to_str(char* str, int* str_ind, int num);
 int reverse_number(int num);
 char int_to_char(int num);
+void clear_string(char* str);
+void free_row(bsa* b, int row);
+void update_last_index(bsa* b);
 
 // Create an empty BSA
 bsa* bsa_init(void){
@@ -28,8 +31,12 @@ bool bsa_set(bsa* b, int indx, int d){
         return false;
     }
     int insertion_row = get_row_to_insert(indx);
-    if(b->row_array[insertion_row].size == 0){
+    if(b->row_array[insertion_row].capacity == 0){
         initialise_row(b, insertion_row);
+    }
+    int offset = get_start_index(insertion_row);
+    if(b->row_array[insertion_row].set_flag[indx-offset] == false){
+        b->row_array[insertion_row].size++;
     }
     insert_in_row(b, insertion_row, indx, d);
     int last_indx = b->last_filled_index;
@@ -47,11 +54,7 @@ int* bsa_get(bsa* b, int indx){
         return NULL;
     }
     int row = get_row_to_insert(indx);
-    // printf("row for indx %i = %i\n", indx, row);
     int offset = get_start_index(row);
-    // printf("offset = %i\n", offset);
-    // printf("row size = %i\n", b->row_array[row].size);
-    // printf("flag is = %i\n", b->row_array[row].set_flag[indx-offset]);
 
     if(b->row_array[row].size == 0){
         return NULL;
@@ -59,7 +62,7 @@ int* bsa_get(bsa* b, int indx){
     if(b->row_array[row].set_flag[indx-offset] == false){
         return NULL;
     }
-    // printf("val = %i\n", b->row_array[row].arr[indx-offset]);
+
     int* result = &(b->row_array[row].arr[indx-offset]);
     return result;
 }
@@ -67,7 +70,21 @@ int* bsa_get(bsa* b, int indx){
 // Delete element at index indx - forces a shrink
 // if that was the only cell in the row occupied.
 bool bsa_delete(bsa* b, int indx){
-    return false;
+    int row_num = get_row_to_insert(indx);
+    int offset = get_start_index(row_num);
+    if(b->row_array[row_num].set_flag[indx-offset] == false){
+        // printf("inside for row = %i, index = %i\n", row_num, indx-offset);
+        return false;
+    }
+    b->row_array[row_num].set_flag[indx-offset] = false;
+    b->row_array[row_num].size--;
+    int size = b->row_array[row_num].size;
+    update_last_index(b);
+    if(size == 0){
+        free_row(b, row_num);
+    }
+
+    return true;
 }
 
 // Returns maximum index written to so far or
@@ -86,13 +103,14 @@ bool bsa_tostring(bsa* b, char* str){
     if(b == NULL || str == NULL){
         return false;
     }
+    clear_string(str);
     int str_ind = 0;
     int last_row = get_row_to_insert(b->last_filled_index);
 
     for(int row=0;row<=last_row;row++){
         str[str_ind++] = '{';
 
-        bool did_insert = insert_to_string(str, &str_ind, &(b->row_array[row]), row);
+        insert_to_string(str, &str_ind, &(b->row_array[row]), row);
 
         //if(did_insert == true){
         //    str[str_ind++] = ' ';
@@ -104,14 +122,32 @@ bool bsa_tostring(bsa* b, char* str){
 
 // Clears up all space used
 bool bsa_free(bsa* b){
-    return false;
+    if(b == NULL){
+        return false;
+    }
+    for(int i=0;i<BSA_ROWS;i++){
+        free_row(b, i);
+    }
+    free(b->row_array);
+    free(b);
+    b = NULL;
+    return true;
 }
 
 // Allow a user-defined function to be applied to each (valid) value 
 // in the array. The user defined 'func' is passed a pointer to an int,
 // and maintains an accumulator of the result where required.
 void bsa_foreach(void (*func)(int* p, int* n), bsa* b, int* acc){
-    return;
+    if(b == NULL || acc == NULL){
+        return;
+    }
+    int last_index = b->last_filled_index;
+    for(int i=0;i<=last_index;i++){
+        int* val = bsa_get(b, i);
+        if(val != NULL){
+            func(val, acc);
+        }
+    }
 }
 
 int get_row_to_insert(int index){
@@ -126,10 +162,11 @@ int get_row_to_insert(int index){
 }
 
 void initialise_row(bsa* b, int row_number){
-    int size = get_row_size(row_number);
-    b->row_array[row_number].arr = (int*)calloc(size, sizeof(int));
-    b->row_array[row_number].size = size;
-    b->row_array[row_number].set_flag = (bool*)calloc(size, sizeof(bool));
+    int capacity = get_row_capacity(row_number);
+    b->row_array[row_number].arr = (int*)calloc(capacity, sizeof(int));
+    b->row_array[row_number].capacity = capacity;
+    b->row_array[row_number].size = 0;
+    b->row_array[row_number].set_flag = (bool*)calloc(capacity, sizeof(bool));
 }
 
 int get_start_index(int row_number){
@@ -141,7 +178,7 @@ int get_end_index(int row_number){
     return end;
 }
 
-int get_row_size(int row_number){
+int get_row_capacity(int row_number){
     int size = (1 << row_number);
     return size;
 }
@@ -150,6 +187,7 @@ void insert_in_row(bsa* b, int insertion_row, int indx, int d){
     int offset = get_start_index(insertion_row);
     indx = indx - offset;
     b->row_array[insertion_row].arr[indx] = d;
+    // printf("value true for row = %i, index = %i, offset = %i\n", insertion_row, indx, offset);
     b->row_array[insertion_row].set_flag[indx] = true;
 }
 
@@ -158,18 +196,20 @@ bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr, int row){
     if(row_arr->size == 0){
         return flag;
     }
-    for(int col=0;col<row_arr->size;col++){
+
+    for(int col=0;col<row_arr->capacity;col++){
         if(row_arr->set_flag[col] == true){
-            flag = true;
-	    if(col != 0){
+            if(flag != false){
                 str[*str_ind] = ' ';
                 *str_ind = *str_ind + 1;
             }
+            flag = true;
             str[*str_ind] = '[';
             *str_ind = *str_ind + 1;
 
             int actual_index = get_start_index(row) + col;
-	    insert_num_to_str(str, str_ind, actual_index);
+            // printf("row = %i, col = %i, actual_col = %i\n", row, col, actual_index);
+            insert_num_to_str(str, str_ind, actual_index);
 
             str[*str_ind] = ']';
             *str_ind = *str_ind + 1;
@@ -178,46 +218,67 @@ bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr, int row){
             *str_ind = *str_ind + 1;
 
             insert_num_to_str(str, str_ind, row_arr->arr[col]);
-	    //if(col != row_arr->size-1){
-	        printf("col = %i and row size = %i, val = %i\n", col, row_arr->size, row_arr->arr[col]);
-	//	str[*str_ind] = ' ';
-	  //      *str_ind = *str_ind + 1;
-	    //}
+            //if(col != row_arr->size-1){
+            // printf("col = %i and row size = %i, val = %i\n", col, row_arr->size, row_arr->arr[col]);
+        //      str[*str_ind] = ' ';
+          //      *str_ind = *str_ind + 1;
+            //}
         }
     }
     return flag;
 }
 
 void insert_num_to_str(char* str, int* str_ind, int num){
-    // int divisor = 10;
-    // // num = reverse_number(num);
-    // while(num > 0){
-    //     int digit = num%divisor;
-    //     num = num/divisor;
-    //     str[*str_ind] = int_to_char(digit);
-    //     *str_ind = *str_ind + 1;
-    // }
     char converted[CHAR_ARR_SIZE] = {0};
     sprintf(converted, "%i", num);
     int num_chars = strlen(converted);
     strcat(str, converted);
     *str_ind = *str_ind + num_chars;
+    // printf("%i converted to ", num);
+    // puts(converted);
+    // printf("result string is ");
+    // puts(str);
 }
-
-// int reverse_number(int num){
-//     int rev = 0;
-//     while (num != 0) {
-//         int rem = num % 10;
-//         rev = rev * 10 + rem;
-//         num /= 10;
-//     }
-// }
 
 char int_to_char(int num){
     return num + '0';
+}
+
+void clear_string(char* str){
+    int i = 0;
+    while(str[i] != '\0'){
+        str[i] = '\0';
+        i++;
+    }
+}
+
+void free_row(bsa* b, int row){
+    if(b == NULL || b->row_array == NULL) return;
+    if(b->row_array[row].arr != NULL){
+        free(b->row_array[row].arr);
+        b->row_array[row].arr = NULL;
+    }
+    if(b->row_array[row].set_flag != NULL){
+        free(b->row_array[row].set_flag);
+        b->row_array[row].set_flag = NULL;
+    }
+}
+
+void update_last_index(bsa* b){
+    int index = b->last_filled_index;
+    while(index >= 0){
+        if(bsa_get(b, index) != NULL){
+            b->last_filled_index = index;
+            return;
+        }
+        index--;
+    }
+    b->last_filled_index = -1;
 }
 
 // You'll this to test the other functions you write
 void test(void){
     return;
 }
+                        
+
