@@ -373,17 +373,22 @@ void test_free_row(void){
 }
 
 void test_insert_num_to_str(void){
-    char str[20];
-    insert_num_to_str(str, 0, 124);
+    char str[20] = {0};
+    int val = 0;
+    insert_num_to_str(str, &val, 124);
     assert(strcmp(str, "124") == 0);
     clear_string(str);
-    insert_num_to_str(str, 0, 7456);
+    val = 0;
+    insert_num_to_str(str, &val, 7456);
     assert(strcmp(str, "7456") == 0);
     clear_string(str);
-    insert_num_to_str(str, 0, 12837);
+    val = 0;
+    insert_num_to_str(str, &val, 12837);
     assert(strcmp(str, "12837") == 0);
     clear_string(str);
-    insert_num_to_str(str, 0, -9459);
+    val = 0;
+    insert_num_to_str(str, &val, -9459);
     assert(strcmp(str, "-9459") == 0);
+    val = 0;
 }
 
