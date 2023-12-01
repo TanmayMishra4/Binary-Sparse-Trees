@@ -47,8 +47,6 @@ bool bsa_set(bsa* b, int indx, int d){
     return true;
 }
 
-// Return pointer to data at element b[i]
-// or NULL if element is unset, or part of a row that hasn't been allocated.
 int* bsa_get(bsa* b, int indx){
     if(indx < 0){
         return NULL;
@@ -70,13 +68,10 @@ int* bsa_get(bsa* b, int indx){
     return result;
 }
 
-// Delete element at index indx - forces a shrink
-// if that was the only cell in the row occupied.
 bool bsa_delete(bsa* b, int indx){
     int row_num = get_row_to_insert(indx);
     int offset = get_start_index(row_num);
     if(b->row_array[row_num].set_flag[indx-offset] == false){
-        // printf("inside for row = %i, index = %i\n", row_num, indx-offset);
         return false;
     }
     b->row_array[row_num].set_flag[indx-offset] = false;
@@ -90,8 +85,6 @@ bool bsa_delete(bsa* b, int indx){
     return true;
 }
 
-// Returns maximum index written to so far or
-// -1 if no cells have been written to yet
 int bsa_maxindex(bsa* b){
     if(b == NULL){
         return -1;
@@ -99,9 +92,6 @@ int bsa_maxindex(bsa* b){
     return b->last_filled_index;
 }
 
-// Returns stringified version of structure
-// Each row has its elements printed between {}, up to the maximum index.
-// Rows after the maximum index are ignored.
 bool bsa_tostring(bsa* b, char* str){
     if(b == NULL || str == NULL){
         return false;
@@ -114,16 +104,11 @@ bool bsa_tostring(bsa* b, char* str){
         str[str_ind++] = '{';
 
         insert_to_string(str, &str_ind, &(b->row_array[row]), row);
-
-        //if(did_insert == true){
-        //    str[str_ind++] = ' ';
-        //}
         str[str_ind++] = '}';
     }
     return true;
 }
 
-// Clears up all space used
 bool bsa_free(bsa* b){
     if(b == NULL){
         return false;
@@ -137,9 +122,6 @@ bool bsa_free(bsa* b){
     return true;
 }
 
-// Allow a user-defined function to be applied to each (valid) value 
-// in the array. The user defined 'func' is passed a pointer to an int,
-// and maintains an accumulator of the result where required.
 void bsa_foreach(void (*func)(int* p, int* n), bsa* b, int* acc){
     if(b == NULL || acc == NULL){
         return;
@@ -197,7 +179,6 @@ void insert_in_row(bsa* b, int insertion_row, int indx, int d){
     int offset = get_start_index(insertion_row);
     indx = indx - offset;
     b->row_array[insertion_row].arr[indx] = d;
-    // printf("value true for row = %i, index = %i, offset = %i\n", insertion_row, indx, offset);
     b->row_array[insertion_row].set_flag[indx] = true;
 }
 
@@ -218,7 +199,7 @@ bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr, int row){
             *str_ind = *str_ind + 1;
 
             int actual_index = get_start_index(row) + col;
-            // printf("row = %i, col = %i, actual_col = %i\n", row, col, actual_index);
+
             insert_num_to_str(str, str_ind, actual_index);
 
             str[*str_ind] = ']';
@@ -228,11 +209,6 @@ bool insert_to_string(char* str, int* str_ind, BSA_row* row_arr, int row){
             *str_ind = *str_ind + 1;
 
             insert_num_to_str(str, str_ind, row_arr->arr[col]);
-            //if(col != row_arr->size-1){
-            // printf("col = %i and row size = %i, val = %i\n", col, row_arr->size, row_arr->arr[col]);
-        //      str[*str_ind] = ' ';
-          //      *str_ind = *str_ind + 1;
-            //}
         }
     }
     return flag;
@@ -244,10 +220,6 @@ void insert_num_to_str(char* str, int* str_ind, int num){
     int num_chars = strlen(converted);
     strcat(str, converted);
     *str_ind = *str_ind + num_chars;
-    // printf("%i converted to ", num);
-    // puts(converted);
-    // printf("result string is ");
-    // puts(str);
 }
 
 void clear_string(char* str){
@@ -283,6 +255,8 @@ void update_last_index(bsa* b){
     }
     b->last_filled_index = -1;
 }
+
+// TESTING
 
 // You'll this to test the other functions you write
 void test(void){
