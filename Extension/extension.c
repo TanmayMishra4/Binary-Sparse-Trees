@@ -120,7 +120,12 @@ void insert_in_row(bsa* b, int row, int indx, int d){
         bst_insert_node(b->bst_array[row], indx, d);
     }
     b->size[row]++;
+    if(b->last_index_bst == NULL){
+        b->last_index_bst = bst_new_node(indx, 0);
+    }
     bst_insert_node(b->last_index_bst, indx, 0);
+    BSA_Tree* t = bst_max_val_node(b->last_index_bst);
+    assert(t != NULL);
     b->last_filled_index = bst_max_val_node(b->last_index_bst)->key;
 }
 
@@ -135,13 +140,14 @@ BSA_Tree* bst_new_node(int key, int val){
 
 BSA_Tree* bst_insert_node(BSA_Tree* root, int key, int val){
     if(!root){
-        return bst_new_node(key, val);
+        root = bst_new_node(key, val);
+	return root;
     }
     if(root->key > key){
-        root->right = bst_insert_node(root->right, key, val);
+        root->left = bst_insert_node(root->left, key, val);
     }
     else if(root->key < key){
-        root->left = bst_insert_node(root->left, key, val);
+        root->right = bst_insert_node(root->right, key, val);
     }
     else{
         root->val = val;
@@ -150,14 +156,13 @@ BSA_Tree* bst_insert_node(BSA_Tree* root, int key, int val){
 }
 
 BSA_Tree* bst_max_val_node(BSA_Tree* root){
-    BSA_Tree* res = root;
-    if(res == NULL){
+    if(root == NULL){
         return NULL;
     }
-    while(res->right != NULL){
-        res = res->right;
+    while(root->right != NULL){
+        root = root->right;
     }
-    return res;
+    return root;
 }
 
 BSA_Tree* bst_find_key(BSA_Tree* root, int key){
@@ -279,5 +284,17 @@ void clear_string(char* str){
         str[i] = '\0';
         i++;
     }
+}
+
+void test(){
+    BSA_Tree* b = bst_new_node(2, 4);
+    bst_insert_node(b, 4, 3);
+    bst_insert_node(b, 1, 5);
+    assert(b->val == 4);
+    assert(b->left != NULL);
+    printf("%i\n", b->left->val);
+    assert(b->left->val == 5);
+    assert(b->right->val == 3);
+    bst_free_tree(b);
 }
 
