@@ -4,14 +4,6 @@
 #define CHAR_ARR_SIZE 50
 #define BUCKET_SIZE 211 //Prime number
 
-typedef struct Node {
-  int key;
-  int val;
-  struct Node *left;
-  struct Node *right;
-  int height;
-} Node;
-
 typedef struct BSA_Tree{
     int key;
     int val;
@@ -44,4 +36,6 @@ void inorder_foreach(void (*func)(int* p, int* n), BSA_Tree* root, int* acc);
 void insert_in_row(bsa* b, int row, int indx, int d);
 void clear_string(char* str);
 bool insert_to_string(char* str, int* str_ind, bsa* b, int row);
+void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), int* acc);
+
 

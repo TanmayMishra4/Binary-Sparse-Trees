@@ -127,10 +127,20 @@ void bsa_foreach(void (*func)(int* p, int* n), bsa* b, int* acc){
         return;
     }
     int last_index = b->last_filled_index;
-    for(int i=0;i<=last_index;i++){
-        int* val = bsa_get(b, i);
-        if(val != NULL){
-            func(val, acc);
+    int last_row = get_row_to_insert(last_index);
+
+    for(int row=0;row<=last_row;row++){
+        if(b->row_array[row].size != 0){
+            int num_elements = 0;
+            int row_size = b->row_array->size;
+            for(int col=0;col<=get_row_capacity(row) && num_elements <= row_size;col++){
+                int index = get_start_index(row) + col;
+                int* val = bsa_get(b, index);
+                if(val){
+                    num_elements++;
+                    func(val, acc);
+                }
+            }
         }
     }
 }

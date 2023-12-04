@@ -100,16 +100,18 @@ void bsa_foreach(void (*func)(int* p, int* n), bsa* b, int* acc){
     if(b == NULL || acc == NULL){
         return;
     }
-    int last_index = BUCKET_SIZE;
-    for(int i=0;i<last_index;i++){
-        if(b->size[i] != 0){
-            inorder_foreach(func, b->bst_array[i], acc);
-        }
-    }
+    inorder_traverse(b, b->last_index_bst, func, acc);
 }
 
+//int generate_hash(int num){
+  //  return num%BUCKET_SIZE;
+//}
 int generate_hash(int num){
-    return num%BUCKET_SIZE;
+    unsigned int x = (unsigned int)num;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = (x >> 16) ^ x;
+    return (int)(x%BUCKET_SIZE);
 }
 
 void insert_in_row(bsa* b, int row, int indx, int d){
@@ -264,6 +266,7 @@ void inorder_to_string(BSA_Tree* root, char* str, int* str_ind, bool* is_first){
     *is_first = false;
     char converted[CHAR_ARR_SIZE];
     int num_char = sprintf(converted, "[%i]=%i", key, val);
+    strcat(str, converted);
     *str_ind = *str_ind + num_char;
 
     inorder_to_string(root->right, str, str_ind, is_first);
@@ -286,13 +289,22 @@ void clear_string(char* str){
     }
 }
 
-void test(){
+void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), int* acc){
+    if(root == NULL){
+        return;
+    }
+
+    inorder_traverse(b, root->left, func, acc);
+    func(bsa_get(b, root->key), acc);
+    inorder_traverse(b, root->right, func, acc);
+}
+
+void test(void){
     BSA_Tree* b = bst_new_node(2, 4);
     bst_insert_node(b, 4, 3);
     bst_insert_node(b, 1, 5);
     assert(b->val == 4);
     assert(b->left != NULL);
-    printf("%i\n", b->left->val);
     assert(b->left->val == 5);
     assert(b->right->val == 3);
     bst_free_tree(b);
