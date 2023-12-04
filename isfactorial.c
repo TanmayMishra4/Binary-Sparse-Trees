@@ -18,6 +18,7 @@ int main(void)
    // Sometime later, look-up factorials
    printf("Printing all factorials\n");
    bsa_foreach(printfacts, b, &i);
+   bsa_free(b);
    return 0;
 }
 
@@ -45,3 +46,5 @@ void printfacts(int* p, int* n)
    *n = 0;
    printf("%d\n", *p);
 }
+
+
