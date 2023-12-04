@@ -103,16 +103,16 @@ void bsa_foreach(void (*func)(int* p, int* n), bsa* b, int* acc){
     inorder_traverse(b, b->last_index_bst, func, acc);
 }
 
-//int generate_hash(int num){
-  //  return num%BUCKET_SIZE;
-//}
 int generate_hash(int num){
-    unsigned int x = (unsigned int)num;
-    x = ((x >> 16) ^ x) * 0x45d9f3b;
-    x = ((x >> 16) ^ x) * 0x45d9f3b;
-    x = (x >> 16) ^ x;
-    return (int)(x%BUCKET_SIZE);
+    return num%BUCKET_SIZE;
 }
+//int generate_hash(int num){
+    //unsigned int x = (unsigned int)num;
+   // x = ((x >> 16) ^ x) * 0x45d9f3b;
+    //x = ((x >> 16) ^ x) * 0x45d9f3b;
+    //x = (x >> 16) ^ x;
+  //  return (int)(x%BUCKET_SIZE);
+//}
 
 void insert_in_row(bsa* b, int row, int indx, int d){
     if(b->size[row] == 0){
@@ -295,7 +295,10 @@ void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), int*
     }
 
     inorder_traverse(b, root->left, func, acc);
-    func(bsa_get(b, root->key), acc);
+    int* val = bsa_get(b, root->key);
+    if(val){
+        func(val, acc);
+    }
     inorder_traverse(b, root->right, func, acc);
 }
 
