@@ -2,7 +2,7 @@
 #include "../bsa.h"
 
 #define CHAR_ARR_SIZE 50
-#define BUCKET_SIZE 211 //Prime number
+#define BUCKET_SIZE 571 //Prime number
 
 typedef struct BSA_Tree{
     int key;

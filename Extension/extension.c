@@ -49,6 +49,10 @@ bool bsa_delete(bsa* b, int indx){
         return false;
     }
     b->size[row_num]--;
+    if(b->size[row_num] == 0){
+        free(b->bst_array[row_num]);
+	b->bst_array[row_num] = NULL;
+    }
     bst_delete_node(b->last_index_bst, indx);
     bst_delete_node(b->bst_array[row_num], indx);
 
