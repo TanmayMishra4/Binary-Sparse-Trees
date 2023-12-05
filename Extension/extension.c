@@ -31,28 +31,34 @@ int* bsa_get(bsa* b, int indx){
     }
     int row = generate_hash(indx);
 
-    if(b->size[row] == 0){
-        return NULL;
-    }
-    BSA_Tree* result = bst_find_key(b->bst_array[row], indx);
+    // if(b->size[row] == 0){
+    //     return NULL;
+    // }
+    static BSA_Tree* result;
+    result = bst_find_key(b->bst_array[row], indx);
     if(result == NULL){
         return NULL;
     }
 
-    int* val = &(result->val);
-    return val;
+    return &(result->val);
 }
 
 bool bsa_delete(bsa* b, int indx){
+    static bool flag = true;
+    if(flag){
+        // printf("tree after setting all values\n");
+        // printInorder(b->last_index_bst);
+        flag = false;
+    }
     int row_num = generate_hash(indx);
     if(b->size[row_num] == 0){
         return false;
     }
     b->size[row_num]--;
-    if(b->size[row_num] == 0){
-        free(b->bst_array[row_num]);
-	    b->bst_array[row_num] = NULL;
-    }
+    // if(b->size[row_num] == 0){
+    //     free(b->bst_array[row_num]);
+	//     b->bst_array[row_num] = NULL;
+    // }
     // printf("tree before deleting index %i\n", indx);
     // printInorder(b->last_index_bst);
     b->last_index_bst = bst_delete_node(b->last_index_bst, indx);

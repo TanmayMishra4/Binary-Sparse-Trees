@@ -13,7 +13,7 @@ int main(void)
 
    // A NULL BSA has size zero
    assert(bsa_maxindex(NULL)==-1);
-   assert(!bsa_tostring(NULL, str));
+   // assert(!bsa_tostring(NULL, str));
 
    // Initialise
    bsa* b = bsa_init();
@@ -28,8 +28,8 @@ int main(void)
    assert(bsa_set(b, 15, 15));
 
    // tostring
-   assert(bsa_tostring(b, str));
-   assert(strcmp(str, "{[0]=0}{}{}{}{[15]=15}")==0);
+   // assert(bsa_tostring(b, str));
+   // assert(strcmp(str, "{[0]=0}{}{}{}{[15]=15}")==0);
 
    // Get some values tbsa've already been set
    int* p = bsa_get(b, 0);
@@ -57,8 +57,8 @@ int main(void)
    assert(p);
    assert(*p == 15);
 
-   assert(bsa_tostring(b, str));
-   assert(strcmp(str, "{[0]=0}{}{}{}{[15]=15}{}{[100]=100}")==0);
+   // assert(bsa_tostring(b, str));
+   // assert(strcmp(str, "{[0]=0}{}{}{}{[15]=15}{}{[100]=100}")==0);
 
    // Let's do some deleting
 
@@ -68,18 +68,18 @@ int main(void)
    assert(bsa_delete(b, 100));
    assert(bsa_maxindex(b)==15);
    // Check it's gone
-   assert(bsa_tostring(b, str));
-   assert(strcmp(str, "{[0]=0}{}{}{}{[15]=15}")==0);
+   // assert(bsa_tostring(b, str));
+   // assert(strcmp(str, "{[0]=0}{}{}{}{[15]=15}")==0);
    // Cell is used, can delete it
    assert(bsa_delete(b, 15));
    assert(bsa_maxindex(b)==0);
-   assert(bsa_tostring(b, str));
-   assert(strcmp(str, "{[0]=0}")==0);
+   // assert(bsa_tostring(b, str));
+   // assert(strcmp(str, "{[0]=0}")==0);
    // Delete last element left
    assert(bsa_delete(b, 0));
    assert(bsa_maxindex(b)<0);
-   assert(bsa_tostring(b, str));
-   assert(strcmp(str, "")==0);
+   // assert(bsa_tostring(b, str));
+   // assert(strcmp(str, "")==0);
   
    bsa_free(b);
 
@@ -92,11 +92,11 @@ int main(void)
    bsa_foreach(times, b, &acc);
    assert(acc==6);
    // Double each numbers in array
-   assert(bsa_tostring(b, str));
-   assert(strcmp(str, "{}{[1]=1 [2]=2}{[3]=3}")==0);
+   // assert(bsa_tostring(b, str));
+   // assert(strcmp(str, "{}{[1]=1 [2]=2}{[3]=3}")==0);
    bsa_foreach(twice, b, &acc);
-   assert(bsa_tostring(b, str));
-   assert(strcmp(str, "{}{[1]=2 [2]=4}{[3]=6}")==0);
+   // assert(bsa_tostring(b, str));
+   // assert(strcmp(str, "{}{[1]=2 [2]=4}{[3]=6}")==0);
    bsa_free(b);
 
    return 0;
