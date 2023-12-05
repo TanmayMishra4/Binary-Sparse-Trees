@@ -25,7 +25,7 @@ int main(void)
    bsa_foreach(print, b, &p);
    bsa_free(b);
    return 0;
-   
+
 }
 
 int next_factor(bsa* b, int p)
