@@ -43,7 +43,7 @@ sieve_valgrind: bsa.h Alloc/specific.h Alloc/alloc.c sieve.c
 
 ## Only if you do an extension. Uncomment in all, extfibmemo_s and run.
 extfibmemo_s: bsa.h Extension/specific.h Extension/extension.c fibmemo.c
-	$extsieve_s(CC) fibmemo.c Extension/extension.c -o extfibmemo_s -I./Extension $(SANITIZE)
+	$(CC) fibmemo.c Extension/extension.c -o extfibmemo_s -I./Extension $(SANITIZE)
 
 extfibmemo_valgrind: bsa.h Extension/specific.h Extension/extension.c fibmemo.c
 	$(CC) fibmemo.c Extension/extension.c -o extfibmemo_valgrind -I./Extension $(VALGRIND)
@@ -69,7 +69,7 @@ extsieve: bsa.h Extension/specific.h Extension/extension.c fibmemo.c
 extsieve_s: bsa.h Extension/specific.h Extension/extension.c fibmemo.c
 	$(CC) sieve.c Extension/extension.c -o extsieve_s -I./Extension $(SANITIZE)
 
-run: driverbsa driverbsa_s fibmemo sieve_s isfactorial extfibmemo_s
+run: driverbsa driverbsa_s fibmemo sieve_s isfactorial extfibmemo_s extisfact extsieve extsieve_s
 	./driverbsa_s
 	./isfactorial
 	./fibmemo
