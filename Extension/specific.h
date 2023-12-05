@@ -2,7 +2,7 @@
 #include "../bsa.h"
 
 #define CHAR_ARR_SIZE 50
-#define BUCKET_SIZE 571 //Prime number
+#define BUCKET_SIZE 211 //Prime number
 
 typedef struct BSA_Tree{
     int key;
@@ -37,5 +37,8 @@ void insert_in_row(bsa* b, int row, int indx, int d);
 void clear_string(char* str);
 bool insert_to_string(char* str, int* str_ind, bsa* b, int row);
 void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), int* acc);
+void printInorder(BSA_Tree* root);
+BSA_Tree* findBSTMin(BSA_Tree* root);
+BSA_Tree* deleteBSTMin(BSA_Tree* root);
 
 

@@ -45,16 +45,20 @@ int* bsa_get(bsa* b, int indx){
 
 bool bsa_delete(bsa* b, int indx){
     int row_num = generate_hash(indx);
-    if(b->size[row_num] == 0 || bst_find_key(b->bst_array[row_num], indx) == NULL){
+    if(b->size[row_num] == 0){
         return false;
     }
     b->size[row_num]--;
     if(b->size[row_num] == 0){
         free(b->bst_array[row_num]);
-	b->bst_array[row_num] = NULL;
+	    b->bst_array[row_num] = NULL;
     }
-    bst_delete_node(b->last_index_bst, indx);
-    bst_delete_node(b->bst_array[row_num], indx);
+    // printf("tree before deleting index %i\n", indx);
+    // printInorder(b->last_index_bst);
+    b->last_index_bst = bst_delete_node(b->last_index_bst, indx);
+    b->bst_array[row_num] = bst_delete_node(b->bst_array[row_num], indx);
+    // printf("tree after deleting index %i\n", indx);
+    // printInorder(b->last_index_bst);
 
     return true;
 }
@@ -147,7 +151,7 @@ BSA_Tree* bst_new_node(int key, int val){
 BSA_Tree* bst_insert_node(BSA_Tree* root, int key, int val){
     if(!root){
         root = bst_new_node(key, val);
-	return root;
+	    return root;
     }
     if(root->key > key){
         root->left = bst_insert_node(root->left, key, val);
@@ -192,43 +196,34 @@ BSA_Tree* bst_delete_node(BSA_Tree* root, int key){
     }
     if(root->key > key){
         root->left = bst_delete_node(root->left, key);
-        return root;
     }
     else if(root->key < key){
         root->right = bst_delete_node(root->right, key);
-        return root;
     }
-
-    if (root->left == NULL) {
-        BSA_Tree* temp = root->right;
-        free(root);
-        root = NULL;
-        return temp;
-    }
-    else if (root->right == NULL) {
-        BSA_Tree* temp = root->left;
-        free(root);
-        root = NULL;
-        return temp;
-    }
-    else {
-        BSA_Tree* par = root;
-        BSA_Tree* child = root->right;
-        while (child->left != NULL){
-            par = child;
-            child = child->left;
+    else{
+        if (root->left == NULL && root->right == NULL) {
+            free(root);
+            root = NULL;
+            return NULL;
         }
-        if (par != root){
-            par->left = child->right;
+        else if (root->left == NULL) {
+            BSA_Tree* temp = root->right;
+            free(root);
+            root = NULL;
+            return temp;
         }
-        else{
-            par->right = child->right;
+        else if(root->right == NULL){
+            BSA_Tree* temp = root->left;
+            free(root);
+            root = NULL;
+            return temp;
         }
-        root->key = child->key;
-        free(child);
-        child = NULL;
-        return root;
+        BSA_Tree* temp = findBSTMin(root->right);
+        root->key = temp->key;
+        root->right = deleteBSTMin(root->right);
     }
+    return root;
+    
 }
 
 void bst_free_tree(BSA_Tree* root){
@@ -305,6 +300,38 @@ void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), int*
     }
     inorder_traverse(b, root->right, func, acc);
 }
+
+void printInorder(BSA_Tree* root){
+    if(!root){
+        return;
+    }
+
+    printInorder(root->left);
+    printf("%i\n", root->key);
+    printInorder(root->right);
+}
+
+BSA_Tree* findBSTMin(BSA_Tree* root){
+    while(root->left != NULL){
+        root = root->left;
+    }
+    return root;
+}
+
+BSA_Tree* deleteBSTMin(BSA_Tree* root){
+    if(root == NULL){
+        return NULL;
+    }
+    if(root->left == NULL){
+        BSA_Tree* temp = root->right;
+        free(root);
+        root = NULL;
+        return temp;
+    }
+    root->left = deleteBSTMin(root->left);
+    return root;
+}
+
 
 void test(void){
     BSA_Tree* b = bst_new_node(2, 4);
