@@ -50,10 +50,11 @@ bool bsa_delete(bsa* b, int indx){
         // printInorder(b->last_index_bst);
         flag = false;
     }
+    // printf("deleting index %i\n", indx);
     int row_num = generate_hash(indx);
-    if(b->size[row_num] == 0){
-        return false;
-    }
+    // if(b->size[row_num] == 0){
+    //     return false;
+    // }
     b->size[row_num]--;
     // if(b->size[row_num] == 0){
     //     free(b->bst_array[row_num]);
@@ -61,6 +62,7 @@ bool bsa_delete(bsa* b, int indx){
     // }
     // printf("tree before deleting index %i\n", indx);
     // printInorder(b->last_index_bst);
+    // printf("deleting index %i\n", indx);
     b->last_index_bst = bst_delete_node(b->last_index_bst, indx);
     b->bst_array[row_num] = bst_delete_node(b->bst_array[row_num], indx);
     // printf("tree after deleting index %i\n", indx);
