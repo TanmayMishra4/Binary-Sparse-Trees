@@ -34,10 +34,6 @@ int* bsa_get(bsa* b, int indx){
         return NULL;
     }
     int row = generate_hash(indx);
-
-    // if(b->size[row] == 0){
-    //     return NULL;
-    // }
     static BSA_Tree* result;
     result = bst_find_key(b->bst_array[row], indx);
     if(result == NULL){
@@ -50,27 +46,13 @@ int* bsa_get(bsa* b, int indx){
 bool bsa_delete(bsa* b, int indx){
     static bool flag = true;
     if(flag){
-        // printf("tree after setting all values\n");
-        // printInorder(b->last_index_bst);
         flag = false;
     }
-    // printf("deleting index %i\n", indx);
+
     int row_num = generate_hash(indx);
-    // if(b->size[row_num] == 0){
-    //     return false;
-    // }
     b->size[row_num]--;
-    // if(b->size[row_num] == 0){
-    //     free(b->bst_array[row_num]);
-	//     b->bst_array[row_num] = NULL;
-    // }
-    // printf("tree before deleting index %i\n", indx);
-    // printInorder(b->last_index_bst);
-    // printf("deleting index %i\n", indx);
     b->last_index_bst = bst_delete_node(b->last_index_bst, indx);
     b->bst_array[row_num] = bst_delete_node(b->bst_array[row_num], indx);
-    // printf("tree after deleting index %i\n", indx);
-    // printInorder(b->last_index_bst);
 
     return true;
 }
@@ -89,16 +71,6 @@ int bsa_maxindex(bsa* b){
 bool bsa_tostring(bsa* b, char* str){
     if(b == NULL || str == NULL){
         return false;
-    }
-    clear_string(str);
-    int str_ind = 0;
-    int last_row = BUCKET_SIZE;
-
-    for(int row=0;row<last_row;row++){
-        str[str_ind++] = '{';
-
-        insert_to_string(str, &str_ind, b, row);
-        str[str_ind++] = '}';
     }
     return true;
 }
@@ -126,13 +98,6 @@ void bsa_foreach(void (*func)(int* p, int* n), bsa* b, int* acc){
 int generate_hash(int num){
     return num%BUCKET_SIZE;
 }
-//int generate_hash(int num){
-    //unsigned int x = (unsigned int)num;
-   // x = ((x >> 16) ^ x) * 0x45d9f3b;
-    //x = ((x >> 16) ^ x) * 0x45d9f3b;
-    //x = (x >> 16) ^ x;
-  //  return (int)(x%BUCKET_SIZE);
-//}
 
 void insert_in_row(bsa* b, int row, int indx, int d){
     if(b->size[row] == 0){
@@ -234,12 +199,11 @@ BSA_Tree* bst_delete_node(BSA_Tree* root, int key){
             root = NULL;
             return temp;
         }
-        BSA_Tree* temp = findBSTMin(root->right);
+        BSA_Tree* temp = find_bst_min(root->right);
         root->key = temp->key;
-        root->right = deleteBSTMin(root->right);
+        root->right = delete_bst_min(root->right);
     }
-    return root;
-    
+    return root; 
 }
 
 void bst_free_tree(BSA_Tree* root){
@@ -256,46 +220,6 @@ void bst_free_tree(BSA_Tree* root){
     root = NULL;
 }
 
-bool insert_to_string(char* str, int* str_ind, bsa* b, int row){
-    bool flag = false;
-    if(b->size[row] == 0){
-        return flag;
-    }
-    bool is_first = true;
-    inorder_to_string(b->bst_array[row], str, str_ind, &is_first);
-
-    return flag;
-}
-
-void inorder_to_string(BSA_Tree* root, char* str, int* str_ind, bool* is_first){
-    if(root == NULL){
-        return;
-    }
-    inorder_to_string(root->left, str, str_ind, is_first);
-    if(*is_first == false){
-        str[*str_ind] = ' ';
-        *str_ind = *str_ind + 1;
-    }
-    int key = root->key;
-    int val = root->val;
-    *is_first = false;
-    char converted[CHAR_ARR_SIZE];
-    int num_char = sprintf(converted, "[%i]=%i", key, val);
-    strcat(str, converted);
-    *str_ind = *str_ind + num_char;
-
-    inorder_to_string(root->right, str, str_ind, is_first);
-}
-
-void inorder_foreach(void (*func)(int* p, int* n), BSA_Tree* root, int* acc){
-    if(root == NULL){
-        return;
-    }
-    inorder_foreach(func, root->left, acc);
-    func(&(root->val), acc);
-    inorder_foreach(func, root->right, acc);
-}
-
 void clear_string(char* str){
     int i = 0;
     while(str[i] != '\0'){
@@ -304,7 +228,8 @@ void clear_string(char* str){
     }
 }
 
-void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), int* acc){
+void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), 
+                      int* acc){
     if(root == NULL){
         return;
     }
@@ -317,24 +242,14 @@ void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), int*
     inorder_traverse(b, root->right, func, acc);
 }
 
-void printInorder(BSA_Tree* root){
-    if(!root){
-        return;
-    }
-
-    printInorder(root->left);
-    printf("%i\n", root->key);
-    printInorder(root->right);
-}
-
-BSA_Tree* findBSTMin(BSA_Tree* root){
+BSA_Tree* find_bst_min(BSA_Tree* root){
     while(root->left != NULL){
         root = root->left;
     }
     return root;
 }
 
-BSA_Tree* deleteBSTMin(BSA_Tree* root){
+BSA_Tree* delete_bst_min(BSA_Tree* root){
     if(root == NULL){
         return NULL;
     }
@@ -344,7 +259,7 @@ BSA_Tree* deleteBSTMin(BSA_Tree* root){
         root = NULL;
         return temp;
     }
-    root->left = deleteBSTMin(root->left);
+    root->left = delete_bst_min(root->left);
     return root;
 }
 
@@ -358,5 +273,108 @@ void test(void){
     assert(b->left->val == 5);
     assert(b->right->val == 3);
     bst_free_tree(b);
+
+    test_generate_hash();
+    test_bst_new_node();
+    test_bst_insert_node();
+    test_bst_max_val_node();
+    test_bst_find_key();
+    test_find_bst_min();
+    test_delete_bst_min();
 }
+
+void test_generate_hash(void){
+    int hash = generate_hash(0);
+    assert(hash >= 0 && hash <= BUCKET_SIZE);
+    hash = generate_hash(100);
+    assert(hash >= 0 && hash <= BUCKET_SIZE);
+    hash = generate_hash(9237987);
+    assert(hash >= 0 && hash <= BUCKET_SIZE);
+}
+
+void test_bst_new_node(void){
+    BSA_Tree* root = bst_new_node(1, 0);
+    assert(root->key == 1);
+    assert(root->val == 0);
+    assert(root->left == NULL);
+    assert(root->right == NULL);
+    bst_free_tree(root);
+
+    root = bst_new_node(5347, 237547);
+    assert(root->key == 5347);
+    assert(root->val == 237547);
+    assert(root->left == NULL);
+    assert(root->right == NULL);
+    bst_free_tree(root);
+
+    root = bst_new_node(286348, -349);
+    assert(root->key == 286348);
+    assert(root->val == -349);
+    assert(root->left == NULL);
+    assert(root->right == NULL);
+    bst_free_tree(root);
+}
+
+void test_bst_insert_node(void){
+    BSA_Tree* root = bst_new_node(10, 0);
+    bst_insert_node(root, 23424, 50);
+    bst_insert_node(root, 99, -70);
+    bst_insert_node(root, 5, 12);
+    assert(root->right->key == 23424);
+    assert(root->right->val == 50);
+    assert(root->right->left->key == 99);
+    assert(root->right->left->val == -70);
+    assert(root->left->key == 5);
+    assert(root->left->val == 12);
+    bst_free_tree(root);
+}
+
+void test_bst_max_val_node(void){
+    BSA_Tree* root = bst_new_node(10, 0);
+    bst_insert_node(root, 23424, 50);
+    bst_insert_node(root, 99, -70);
+    bst_insert_node(root, 5, 12);
+    assert(bst_max_val_node(root)->key == 23424);
+    bst_free_tree(root);
+
+    root = bst_new_node(2, 0);
+    assert(bst_max_val_node(root)->key == 2);
+    bst_free_tree(root);
+}
+
+void test_bst_find_key(void){
+    BSA_Tree* root = bst_new_node(10, 0);
+    bst_insert_node(root, 23424, 50);
+    bst_insert_node(root, 99, -70);
+    bst_insert_node(root, 5, 12);
+    assert(bst_find_key(root, 23424)->key == 23424);
+    assert(bst_find_key(root, 99)->key == 99);
+    assert(bst_find_key(root, 5)->key == 5);
+    bst_free_tree(root);
+}
+
+void test_find_bst_min(void){
+    BSA_Tree* root = bst_new_node(10, 0);
+    bst_insert_node(root, 23424, 50);
+    bst_insert_node(root, 99, -70);
+    bst_insert_node(root, 5, 12);
+    assert(find_bst_min(root)->key == 5);
+    bst_free_tree(root);
+
+    root = bst_new_node(10, 0);
+    assert(find_bst_min(root)->key == 10);
+    bst_free_tree(root);
+}
+
+void test_delete_bst_min(void){
+    BSA_Tree* root = bst_new_node(10, 0);
+    bst_insert_node(root, 23424, 50);
+    bst_insert_node(root, 99, -70);
+    bst_insert_node(root, 5, 12);
+    root = delete_bst_min(root);
+    assert(root->left == NULL);
+    root = delete_bst_min(root);
+    bst_free_tree(root);
+}
+
 

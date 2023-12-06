@@ -18,27 +18,26 @@ struct bsa{
     BSA_Tree* last_index_bst;
 };
 
-int max(int a, int b);
 int generate_hash(int n);
-int bst_height(BSA_Tree* root);
 BSA_Tree* bst_new_node(int key, int val);
-BSA_Tree* bst_right_rotate(BSA_Tree* root);
-BSA_Tree* bst_left_rotate(BSA_Tree* root);
-int bst_get_balance(BSA_Tree* root);
 BSA_Tree* bst_insert_node(BSA_Tree* root, int key, int val);
 BSA_Tree* bst_max_val_node(BSA_Tree* root);
 BSA_Tree* bst_delete_node(BSA_Tree* root, int key);
 BSA_Tree* bst_find_key(BSA_Tree* root, int key);
-void initialize_row(bsa* bsa, int row_num);
 void bst_free_tree(BSA_Tree* root);
-void inorder_to_string(BSA_Tree* root, char* str, int* str_ind, bool* is_first);
-void inorder_foreach(void (*func)(int* p, int* n), BSA_Tree* root, int* acc);
 void insert_in_row(bsa* b, int row, int indx, int d);
-void clear_string(char* str);
-bool insert_to_string(char* str, int* str_ind, bsa* b, int row);
 void inorder_traverse(bsa* b, BSA_Tree* root, void (*func)(int* p, int* n), int* acc);
-void printInorder(BSA_Tree* root);
-BSA_Tree* findBSTMin(BSA_Tree* root);
-BSA_Tree* deleteBSTMin(BSA_Tree* root);
-
-
+BSA_Tree* find_bst_min(BSA_Tree* root);
+BSA_Tree* delete_bst_min(BSA_Tree* root);
+// --------------TESTING FUNCTIONS----------------------------
+void test_generate_hash(void);
+void test_bst_new_node();
+void test_bst_insert_node(void);
+void test_bst_max_val_node(void);
+void test_bst_find_key(void);
+void test_delete_node(void);
+void test_bst_free_tree(void);
+void test_inorder_traverse(void);
+void test_find_bst_min(void);
+void test_delete_bst_min(void);
+void testing_func_inorder(int* p, int* n);

@@ -37,10 +37,17 @@ by the user.
 
 Comparison of Run Time and Memory usage:
 Run Time Analysis
+                            times in seconds
                    BSA          Hash Map with BST      input values
-factorial        O(Log N)            O(N)                   
-sieve            O(Log N)            O(N)
-fibmemo          O(1)                O(1)
-factorial        O(Log N)            O(N)
-sieve            O(Log N)            O(N)
-fibmemo
+factorial          5.8                 1.8                500000000
+sieve              0.012               16.9               4000
+fibmemo            0.22                0.135              35
+factorial          11.5                7.3                2000000000
+fibmemo            27                  16.7               45
+
+
+Memory usage analysis in kBs
+                  BSA          Hash Map with BST      input values
+factorial          12000               4                  5000000
+sieve              7.6                 16.6               4000
+fibmemo            5                   3.7                35
