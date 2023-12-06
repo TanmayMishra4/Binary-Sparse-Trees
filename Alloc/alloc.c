@@ -23,8 +23,16 @@ void test_insert_num_to_str(void);
 
 bsa* bsa_init(void){
     bsa* b = (bsa*)calloc(BSA_ROWS, sizeof(bsa));
+    if(b == NULL){
+        fprintf(stderr, "Cannot Calloc memory\n");
+        exit(EXIT_FAILURE);
+    }
     b->last_filled_index = -1;
     b->row_array = (BSA_row*)calloc(BSA_ROWS, sizeof(BSA_row));
+    if(b->row_array == NULL){
+        fprintf(stderr, "Cannot Calloc memory\n");
+        exit(EXIT_FAILURE);
+    }
 
     return b;
 }
@@ -160,9 +168,17 @@ int get_row_to_insert(int index){
 void initialise_row(bsa* b, int row_number){
     int capacity = get_row_capacity(row_number);
     b->row_array[row_number].arr = (int*)calloc(capacity, sizeof(int));
+    if(b->row_array[row_number].arr == NULL){
+        fprintf(stderr, "Cannot calloc memory\n");
+        exit(EXIT_FAILURE);
+    }
     b->row_array[row_number].capacity = capacity;
     b->row_array[row_number].size = 0;
     b->row_array[row_number].set_flag = (bool*)calloc(capacity, sizeof(bool));
+    if(b->row_array[row_number].set_flag == NULL){
+        fprintf(stderr, "Cannot calloc memory\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 int get_start_index(int row_number){

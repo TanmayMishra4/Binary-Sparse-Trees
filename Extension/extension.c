@@ -2,6 +2,10 @@
 
 bsa* bsa_init(void){
     bsa* b = (bsa*)calloc(1, sizeof(bsa));
+    if(b == NULL){
+        fprintf(stderr, "Cannot calloc memory\n");
+        exit(EXIT_FAILURE);
+    }
     b->last_filled_index = -1;
     b->last_index_bst = NULL;
     for(int i=0;i<BUCKET_SIZE;i++){
@@ -149,6 +153,10 @@ void insert_in_row(bsa* b, int row, int indx, int d){
 
 BSA_Tree* bst_new_node(int key, int val){
     BSA_Tree* node = (BSA_Tree*)calloc(1, sizeof(BSA_Tree));
+    if(node == NULL){
+        fprintf(stderr, "Cannot Calloc memory\n");
+        exit(EXIT_FAILURE);
+    }
     node->key = key;
     node->val = val;
     node->left = NULL;
